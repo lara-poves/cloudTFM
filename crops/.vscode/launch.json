@@ -1,0 +1,116 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "soil Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/soil",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\soil",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    },
+    {
+      "name": "soil Local Debug (Python)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/modules/soil/main.py",
+      "console": "integratedTerminal",
+      "env": {
+        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
+        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
+      },
+      "windows": {
+        "program": "${workspaceFolder}\\modules\\soil\\main.py"
+      }
+    },
+    {
+      "name": "leaves Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/leaves",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\leaves",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    },
+    {
+      "name": "leaves Local Debug (Python)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/modules/leaves/main.py",
+      "console": "integratedTerminal",
+      "env": {
+        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
+        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
+      },
+      "windows": {
+        "program": "${workspaceFolder}\\modules\\leaves\\main.py"
+      }
+    },
+    {
+      "name": "ambient Remote Debug (Python)",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "logToFile": true,
+      "redirectOutput": true,
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/modules/ambient",
+          "remoteRoot": "/app"
+        }
+      ],
+      "windows": {
+        "pathMappings": [
+          {
+            "localRoot": "${workspaceFolder}\\modules\\ambient",
+            "remoteRoot": "/app"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ambient Local Debug (Python)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/modules/ambient/main.py",
+      "console": "integratedTerminal",
+      "env": {
+        "EdgeHubConnectionString": "${config:azure-iot-edge.EdgeHubConnectionString}",
+        "EdgeModuleCACertificateFile": "${config:azure-iot-edge.EdgeModuleCACertificateFile}"
+      },
+      "windows": {
+        "program": "${workspaceFolder}\\modules\\ambient\\main.py"
+      }
+    }
+  ]
+}

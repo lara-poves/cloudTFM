@@ -1,0 +1,127 @@
+{
+  "$schema-template": "4.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.1",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "containeRegistryFP": {
+                "username": "${CONTAINER_REGISTRY_USERNAME}",
+                "password": "${CONTAINER_REGISTRY_PASSWORD}",
+                "address": "${CONTAINER_REGISTRY_ADDRESS}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
+              "createOptions": {}
+            },
+            "platform": {
+              "os": "linux",
+              "architecture": "arm32"
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "platform": {
+              "os": "linux",
+              "architecture": "arm32"
+            }
+          }
+        },
+        "modules": {
+          "ambient": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
+              "createOptions": {}
+            },
+            "platform": {
+              "os": "linux",
+              "architecture": "arm32"
+            }
+          },
+          "leaves": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_LEAVES}:${MODULE_VERSION_LEAVES}",
+              "createOptions": {}
+            },
+            "platform": {
+              "os": "linux",
+              "architecture": "arm32"
+            }
+          },
+          "soil": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
+              "createOptions": {}
+            },
+            "platform": {
+              "os": "linux",
+              "architecture": "arm32"
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.2",
+        "routes": {
+          "ambientToIoTHub": "FROM /messages/modules/ambient/outputs/* INTO $upstream",
+          "leavesToIoTHub": "FROM /messages/modules/leaves/outputs/* INTO $upstream",
+          "soilToIoTHub": "FROM /messages/modules/soil/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
