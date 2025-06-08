@@ -11,7 +11,7 @@ stages:
       vmImage: ubuntu-22.04
     steps:
 
-    # Instala buildx y prepara el builder
+    # Builder for ARM32
     - script: |
         docker run --privileged --rm tonistiigi/binfmt --install all
         docker buildx create --use --name multiarch
@@ -21,23 +21,21 @@ stages:
     # AMBIENT
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
-        dotnet publish --os linux --arch arm /t:PublishContainer
         docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) --push .
       displayName: 'Build and Push ARM32 Image: Ambient'
 
     # SOIL
     - script: |
         cd ./modules/$(MODULE_SOIL)
-        dotnet publish --os linux --arch arm /t:PublishContainer
         docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) --push .
       displayName: 'Build and Push ARM32 Image: Soil'
 
     # LEAVES
     - script: |
         cd ./modules/$(MODULE_LEAVES)
-        dotnet publish --os linux --arch arm /t:PublishContainer
         docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) --push .
       displayName: 'Build and Push ARM32 Image: Leaves'
+
 
 - stage: Release
   jobs:
