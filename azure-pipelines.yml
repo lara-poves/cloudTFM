@@ -10,20 +10,20 @@ stages:
     pool:
       vmImage: ubuntu-22.04
     steps:
-
+    
     - script: |
         docker run --privileged --rm tonistiigi/binfmt --install all
-        docker buildx create --use --name builder
+        docker buildx create --use --name arm64builder
         docker buildx inspect --bootstrap
 
         docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-      displayName: 'Setup Docker Buildx for multi-arch & Login in CR'
+      displayName: 'Setup buildx & Login in CR'
 
     - script: |
         cd ./modules/$(MODULE_SOIL)
         docker buildx build \
+          --builder arm64builder \
           --platform linux/arm64/v8 \
-          --builder builder \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
           --push .
@@ -32,8 +32,8 @@ stages:
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
         docker buildx build \
+          --builder arm64builder \
           --platform linux/arm64/v8 \
-          --builder builder \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
           --push .
@@ -42,8 +42,8 @@ stages:
     - script: |
         cd ./modules/$(MODULE_LEAVES)
         docker buildx build \
+          --builder arm64builder \
           --platform linux/arm64/v8 \
-          --builder builder \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
           --push .
