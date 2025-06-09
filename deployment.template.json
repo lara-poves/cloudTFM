@@ -27,8 +27,7 @@
             },
             "platform": {
               "os": "linux",
-              "architecture": "arm64",
-              "variant": "v8"
+              "architecture": "arm64"
             }
           },
           "edgeHub": {
@@ -55,8 +54,7 @@
             },
             "platform": {
               "os": "linux",
-              "architecture": "arm64",
-              "variant": "v8"
+              "architecture": "arm64"
             }
           }
         },
@@ -72,8 +70,7 @@
             },
             "platform": {
               "os": "linux",
-              "architecture": "arm64",
-              "variant": "v8"
+              "architecture": "arm64"
             }
           },
           "leaves": {
@@ -87,8 +84,7 @@
             },
             "platform": {
               "os": "linux",
-              "architecture": "arm64",
-              "variant": "v8"
+              "architecture": "arm64"
             }
           },
           "soil": {
@@ -102,8 +98,7 @@
             },
             "platform": {
               "os": "linux",
-              "architecture": "arm64",
-              "variant": "v8"
+              "architecture": "arm64"
             }
           }
         }
