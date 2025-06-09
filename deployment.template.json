@@ -24,10 +24,6 @@
             "settings": {
               "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "architecture": "arm64"
             }
           },
           "edgeHub": {
@@ -51,10 +47,6 @@
                   }
                 }
               }
-            },
-            "platform": {
-              "os": "linux",
-              "architecture": "arm64"
             }
           }
         },
@@ -67,10 +59,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "architecture": "arm64"
             }
           },
           "leaves": {
@@ -81,10 +69,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_LEAVES}:${MODULE_VERSION_LEAVES}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "architecture": "arm64"
             }
           },
           "soil": {
@@ -95,10 +79,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "architecture": "arm64"
             }
           }
         }
