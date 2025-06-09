@@ -71,6 +71,7 @@ stages:
           defaultPlatform: 'arm64v8'
           deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
           validateGeneratedDeploymentManifest: 'false'
+        displayName: 'Generate deployment manifest'
       - task: AzureIoTEdge@2
         inputs:
           action: 'Deploy to IoT Edge devices'
@@ -81,3 +82,4 @@ stages:
           priority: '0'
           deviceOption: 'Single Device'
           deviceId: 'raspberrypi4'
+        displayName: 'Deploy to IoT Edge devices'
