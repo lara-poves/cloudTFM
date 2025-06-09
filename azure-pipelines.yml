@@ -19,6 +19,7 @@ stages:
 
     - script: |
         cd ./modules/$(MODULE_SOIL)
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
         docker buildx build \
           --platform linux/arm64 \
           -f Dockerfile.arm64v8 \
@@ -28,6 +29,7 @@ stages:
 
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
         docker buildx build \
           --platform linux/arm64 \
           -f Dockerfile.arm64v8 \
@@ -37,6 +39,7 @@ stages:
     
     - script: |
         cd ./modules/$(MODULE_LEAVES)
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
         docker buildx build \
           --platform linux/arm64 \
           -f Dockerfile.arm64v8 \
