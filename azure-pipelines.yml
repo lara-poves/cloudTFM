@@ -58,10 +58,9 @@ stages:
         inputs:
           action: 'Generate deployment manifest'
           templateFilePath: 'deployment.template.json'
-          defaultPlatform: 'arm32v7'
+          defaultPlatform: 'arm64v8'
           deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
           validateGeneratedDeploymentManifest: 'false'
-        displayName: 'Generate deploy manifest'
       - task: AzureIoTEdge@2
         inputs:
           action: 'Deploy to IoT Edge devices'
