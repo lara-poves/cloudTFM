@@ -22,6 +22,7 @@ stages:
         docker buildx build \
           --builder arm64builder \
           --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
           --push .
@@ -32,6 +33,7 @@ stages:
         docker buildx build \
           --builder arm64builder \
           --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
           --push .
@@ -42,6 +44,7 @@ stages:
         docker buildx build \
           --builder arm64builder \
           --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
           --push .
