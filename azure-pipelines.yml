@@ -1,5 +1,3 @@
-# Starter pipeline
-
 trigger:
 - main
 
@@ -23,31 +21,35 @@ stages:
         cd ./modules/$(MODULE_SOIL)
         docker buildx build \
           --builder arm64builder \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
           --push .
-      displayName: 'Build and Push ARM64v8 Docker Image for Soil'
+      displayName: 'Build and Push ARM64 Docker Image for Soil'
 
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
         docker buildx build \
           --builder arm64builder \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
           --push .
-      displayName: 'Build and Push ARM64v8 Docker Image for Ambient'
+      displayName: 'Build and Push ARM64 Docker Image for Ambient'
     
     - script: |
         cd ./modules/$(MODULE_LEAVES)
         docker buildx build \
           --builder arm64builder \
-          --platform linux/arm64/v8 \
+          --platform linux/arm64 \
+          --no-cache \
           -f Dockerfile.arm64v8 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
           --push .
-      displayName: 'Build and Push ARM64v8 Docker Image for Leaves'
+      displayName: 'Build and Push ARM64 Docker Image for Leaves'
+
 
 - stage: Release
   jobs:
@@ -74,6 +76,7 @@ stages:
           deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
           validateGeneratedDeploymentManifest: 'false'
         displayName: 'Generate deployment manifest'
+      
       - task: AzureIoTEdge@2
         inputs:
           action: 'Deploy to IoT Edge devices'
