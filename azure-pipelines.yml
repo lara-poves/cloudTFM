@@ -11,31 +11,38 @@ stages:
       vmImage: ubuntu-22.04
     steps:
 
-    # Builder for ARM32
     - script: |
         docker run --privileged --rm tonistiigi/binfmt --install all
-        docker buildx create --use --name multiarch
+        docker buildx create --use --name builder
         docker buildx inspect --bootstrap
-      displayName: 'Setup Docker Buildx for ARM32'
+      displayName: 'Setup Docker Buildx for multi-arch'
 
-    # AMBIENT
-    - script: |
-        cd ./modules/$(MODULE_AMBIENT)
-        docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) --push .
-      displayName: 'Build and Push ARM32 Image: Ambient'
-
-    # SOIL
     - script: |
         cd ./modules/$(MODULE_SOIL)
-        docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) --push .
-      displayName: 'Build and Push ARM32 Image: Soil'
+        docker buildx build \
+          --platform linux/arm64 \
+          -f Dockerfile.arm64v8 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
+          --push .
+      displayName: 'Build and Push ARM64v8 Docker Image for Soil'
 
-    # LEAVES
+    - script: |
+        cd ./modules/$(MODULE_AMBIENT)
+        docker buildx build \
+          --platform linux/arm64 \
+          -f Dockerfile.arm64v8 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
+          --push .
+      displayName: 'Build and Push ARM64v8 Docker Image for Ambient'
+    
     - script: |
         cd ./modules/$(MODULE_LEAVES)
-        docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) --push .
-      displayName: 'Build and Push ARM32 Image: Leaves'
-
+        docker buildx build \
+          --platform linux/arm64 \
+          -f Dockerfile.arm64v8 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
+          --push .
+      displayName: 'Build and Push ARM64v8 Docker Image for Leaves'
 
 - stage: Release
   jobs:
