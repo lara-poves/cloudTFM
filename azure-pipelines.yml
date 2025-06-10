@@ -12,7 +12,7 @@ stages:
         steps:
           - script: |
               cd ./modules/$(MODULE_SOIL)
-              dotnet publish -c Release -r linux-arm /t:PublishContainer
+              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
 
             displayName: 'Build Docker Image Soil'
 
@@ -24,7 +24,7 @@ stages:
 
           - script: |
               cd ./modules/$(MODULE_AMBIENT)
-              dotnet publish -c Release -r linux-arm /t:PublishContainer
+              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
 
             displayName: 'Build Docker Image Ambient'
 
@@ -36,7 +36,7 @@ stages:
 
           - script: |
               cd ./modules/$(MODULE_LEAVES)
-              dotnet publish -c Release -r linux-arm /t:PublishContainer
+              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
 
             displayName: 'Build Docker Image Leaves'
 
