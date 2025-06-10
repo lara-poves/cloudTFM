@@ -2,55 +2,6 @@ trigger:
 - main
 
 stages:
-- stage: Build
-  jobs:
-  - job: J1
-    pool:
-      vmImage: ubuntu-22.04
-    steps:
-    
-    - script: |
-        docker run --privileged --rm tonistiigi/binfmt --install all
-        docker buildx create --use --name arm64builder
-        docker buildx inspect --bootstrap
-
-        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-      displayName: 'Setup buildx & Login in CR'
-
-    - script: |
-        cd ./modules/$(MODULE_SOIL)
-        docker buildx build \
-          --builder arm64builder \
-          --platform linux/arm64 \
-          --no-cache \
-          -f Dockerfile.arm64v8 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
-          --push .
-      displayName: 'Build and Push ARM64 Docker Image for Soil'
-
-    - script: |
-        cd ./modules/$(MODULE_AMBIENT)
-        docker buildx build \
-          --builder arm64builder \
-          --platform linux/arm64 \
-          --no-cache \
-          -f Dockerfile.arm64v8 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
-          --push .
-      displayName: 'Build and Push ARM64 Docker Image for Ambient'
-    
-    - script: |
-        cd ./modules/$(MODULE_LEAVES)
-        docker buildx build \
-          --builder arm64builder \
-          --platform linux/arm64 \
-          --no-cache \
-          -f Dockerfile.arm64v8 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
-          --push .
-      displayName: 'Build and Push ARM64 Docker Image for Leaves'
-
-
 - stage: Release
   jobs:
   - job: J2
@@ -68,6 +19,23 @@ stages:
 
           python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
         displayName: 'Command Line Script'
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Build module images'
+          templateFilePath: 'deployment.template.json'
+          defaultPlatform: 'arm64v8'
+        displayName: 'Build img'
+      
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Push module images'
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscriptionEndpoint: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
+          azureContainerRegistry: '{"loginServer":"containerregistrytfm.azurecr.io"}'
+          templateFilePath: 'deployment.template.json'
+          defaultPlatform: 'arm64v8'
+          fillRegistryCredential: 'true'
+        displayName: 'Push img'
       - task: AzureIoTEdge@2
         inputs:
           action: 'Generate deployment manifest'
