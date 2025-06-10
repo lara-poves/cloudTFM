@@ -10,41 +10,27 @@ stages:
         pool:
           vmImage: ubuntu-22.04
         steps:
-          - script: |
-              cd ./modules/$(MODULE_SOIL)
-              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
-
-            displayName: 'Build Docker Image Soil'
 
           - script: |
               docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-              docker tag $(MODULE_SOIL) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
-              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
-            displayName: 'Push Docker Image Soil'
+              docker buildx create --use --name buildx_builder || true
+            displayName: 'Setup Docker Buildx'
+
+          - script: |
+              cd ./modules/$(MODULE_SOIL)
+              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) --push .
+            displayName: 'Build & Push Docker Image Soil (ARM32)'
 
           - script: |
               cd ./modules/$(MODULE_AMBIENT)
-              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
-
-            displayName: 'Build Docker Image Ambient'
-
-          - script: |
-              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-              docker tag $(MODULE_AMBIENT) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
-              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
-            displayName: 'Push Docker Image Ambient'
+              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) --push .
+            displayName: 'Build & Push Docker Image Ambient (ARM32)'
 
           - script: |
               cd ./modules/$(MODULE_LEAVES)
-              dotnet publish -c Release -r linux-arm -o ./publish --self-contained false
+              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) --push .
+            displayName: 'Build & Push Docker Image Leaves (ARM32)'
 
-            displayName: 'Build Docker Image Leaves'
-
-          - script: |
-              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-              docker tag $(MODULE_LEAVES) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
-              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
-            displayName: 'Push Docker Image Leaves'
 
   - stage: Release
     jobs:
