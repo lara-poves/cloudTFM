@@ -12,7 +12,7 @@ stages:
         steps:
           - script: |
               cd ./modules/$(MODULE_SOIL)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              dotnet publish --os linux --arch arm64v8 /t:PublishContainer
             displayName: 'Build Docker Image Soil'
 
           - script: |
@@ -23,7 +23,7 @@ stages:
 
           - script: |
               cd ./modules/$(MODULE_AMBIENT)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              dotnet publish --os linux --arch arm64v8 /t:PublishContainer
             displayName: 'Build Docker Image Ambient'
 
           - script: |
@@ -34,7 +34,7 @@ stages:
 
           - script: |
               cd ./modules/$(MODULE_LEAVES)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              dotnet publish --os linux --arch arm64v8 /t:PublishContainer
             displayName: 'Build Docker Image Leaves'
 
           - script: |
