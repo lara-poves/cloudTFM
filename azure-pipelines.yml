@@ -10,7 +10,7 @@ stages:
     steps:
     - script: |
         cd ./modules/$(MODULE_SOIL)
-        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) 
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) .
       displayName: 'Build Image for Soil'
     
     - script: |
@@ -21,7 +21,7 @@ stages:
     
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
-        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) 
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) .
       displayName: 'Build Image for Ambient'
     
     - script: |
@@ -32,7 +32,7 @@ stages:
     
     - script: |
         cd ./modules/$(MODULE_LEAVES)
-        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) 
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) .
       displayName: 'Build Image for Soil'
     
     - script: |
