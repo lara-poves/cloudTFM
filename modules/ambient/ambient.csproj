@@ -1,11 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Añadido para especificar la imagen base arm64v8 -->
+    <ContainerBaseImage>arm64v8/dotnet/runtime:8.0</ContainerBaseImage>
+    <PublishProfile>DefaultContainer</PublishProfile>
+    <ContainerImageName>containerregistrytfm.azurecr.io/ambient</ContainerImageName>
+    <ContainerImageTag>0.0.6-arm64</ContainerImageTag>
+    <RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+  </ItemGroup>
 </Project>
+
