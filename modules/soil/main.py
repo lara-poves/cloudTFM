@@ -39,7 +39,7 @@ async def send_sensor_data(client):
         data = {
             "ph": ph,
             "soil_moisture": soil_moisture,
-            "temperature": soil_temperature,
+            "soil_temperature": soil_temperature,
             "nitrogen": nitrogen,
             "phosphorus": phosphorus,
             "potassium": potassium
