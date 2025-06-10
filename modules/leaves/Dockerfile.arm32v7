@@ -1,19 +1,10 @@
-FROM arm32v7/python:3.7-buster
-
-ENV DEBIAN_FRONTEND=noninteractive
+FROM arm32v7/python:3.7-slim-buster
 
 WORKDIR /app
-
-# Install necessary system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libatlas-base-dev \
-    g++ \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
 COPY . .
 
-# Comando por defecto
 CMD ["python3", "-u", "./main.py"]
