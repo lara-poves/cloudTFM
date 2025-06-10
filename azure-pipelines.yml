@@ -10,6 +10,14 @@ stages:
     steps:
 
     - script: |
+        docker run --privileged --rm tonistiigi/binfmt --install all
+        docker buildx create --use --name arm32builder
+        docker buildx inspect --bootstrap
+
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+      displayName: 'Setup buildx & Login in CR'
+
+    - script: |
         cd ./modules/$(MODULE_SOIL)
         docker buildx build \
           --builder arm32builder \
@@ -28,14 +36,6 @@ stages:
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
           --push .
       displayName: 'Build & Push ambient img arm32'
-    
-    - script: |
-        docker run --privileged --rm tonistiigi/binfmt --install all
-        docker buildx create --use --name arm32builder
-        docker buildx inspect --bootstrap
-
-        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-      displayName: 'Setup buildx & Login in CR'
 
     - script: |
         cd ./modules/$(MODULE_LEAVES)
