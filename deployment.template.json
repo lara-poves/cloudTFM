@@ -64,7 +64,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
-              "createOptions": {}
+              "createOptions": {"Cmd": ["dotnet", "/app/soil.dll"]}
             }
           },
           "leaves": {
@@ -74,7 +74,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_LEAVES}:${MODULE_VERSION_LEAVES}",
-              "createOptions": {}
+              "createOptions": {"Cmd": ["dotnet", "/app/leaves.dll"]}
             }
           },
           "ambient": {
@@ -84,7 +84,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
-              "createOptions": {}
+              "createOptions": {"Cmd": ["dotnet", "/app/ambient.dll"]}
             }
           }
         }
