@@ -1,35 +1,12 @@
-FROM arm32v7/python:3.7-buster
+FROM python:3.9-buster
 
 WORKDIR /app
 
-# Instalar dependencias de sistema para compilar opencv-python y scikit-learn
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    pkg-config \
-    libjpeg-dev \
-    libtiff-dev \
-    libpng-dev \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    libv4l-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    libgtk-3-dev \
-    libatlas-base-dev \
-    gfortran \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt ./
-
-# Actualiza pip y setuptools para evitar problemas con versiones viejas
-RUN pip install --upgrade pip setuptools wheel
-
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python3", "-u", "./main.py"]
+CMD ["python", "main.py"]
+
 

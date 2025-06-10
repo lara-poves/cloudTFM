@@ -8,6 +8,26 @@ stages:
     pool:
       vmImage: ubuntu-22.04
     steps:
+
+    - script: |
+        cd ./modules/$(MODULE_SOIL)
+        docker buildx build \
+          --builder arm32builder \
+          --platform linux/arm/v7 \
+          -f Dockerfile.arm32v7 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
+          --push .
+      displayName: 'Build & Push soil img arm32'
+
+    - script: |
+        cd ./modules/$(MODULE_AMBIENT)
+        docker buildx build \
+          --builder arm32builder \
+          --platform linux/arm/v7 \
+          -f Dockerfile.arm32v7 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
+          --push .
+      displayName: 'Build & Push ambient img arm32'
     
     - script: |
         docker run --privileged --rm tonistiigi/binfmt --install all
@@ -22,33 +42,10 @@ stages:
         docker buildx build \
           --builder arm32builder \
           --platform linux/arm/v7 \
-          --no-cache \
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
           --push .
       displayName: 'Build and Push leaves img arm32'
-
-    - script: |
-        cd ./modules/$(MODULE_SOIL)
-        docker buildx build \
-          --builder arm32builder \
-          --platform linux/arm/v7 \
-          --no-cache \
-          -f Dockerfile.arm32v7 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
-          --push .
-      displayName: 'Build & Push soil img arm32'
-
-    - script: |
-        cd ./modules/$(MODULE_AMBIENT)
-        docker buildx build \
-          --builder arm32builder \
-          --platform linux/arm/v7 \
-          --no-cache \
-          -f Dockerfile.arm32v7 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
-          --push .
-      displayName: 'Build & Push ambient img arm32'
 
 - stage: Release
   jobs:
