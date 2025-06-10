@@ -1,0 +1,81 @@
+# Starter pipeline
+
+trigger:
+  - main
+
+stages:
+  - stage: Build
+    jobs:
+      - job: J1
+        pool:
+          vmImage: ubuntu-22.04
+        steps:
+          - script: |
+              cd ./modules/$(MODULE_SOIL)
+              dotnet publish --os linux --arch arm64 /t:PublishContainer
+            displayName: 'Build Docker Image Soil'
+
+          - script: |
+              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+              docker tag $(MODULE_SOIL) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
+              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
+            displayName: 'Push Docker Image Soil'
+
+          - script: |
+              cd ./modules/$(MODULE_AMBIENT)
+              dotnet publish --os linux --arch arm64 /t:PublishContainer
+            displayName: 'Build Docker Image Ambient'
+
+          - script: |
+              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+              docker tag $(MODULE_AMBIENT) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
+              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
+            displayName: 'Push Docker Image Ambient'
+
+          - script: |
+              cd ./modules/$(MODULE_LEAVES)
+              dotnet publish --os linux --arch arm64 /t:PublishContainer
+            displayName: 'Build Docker Image Leaves'
+
+          - script: |
+              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+              docker tag $(MODULE_LEAVES) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
+              docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
+            displayName: 'Push Docker Image Leaves'
+
+  - stage: Release
+    jobs:
+      - job: J2
+        pool:
+          vmImage: ubuntu-22.04
+        steps:
+          - script: |
+              sudo apt install software-properties-common
+              sudo add-apt-repository ppa:deadsnakes/ppa
+              sudo apt install python3.9
+              sudo apt install python3.9-distutils
+              curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+              python3.9 get-pip.py
+              python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
+            displayName: 'Install Python and iotedgedev'
+
+          - task: AzureIoTEdge@2
+            inputs:
+              action: 'Generate deployment manifest'
+              templateFilePath: 'deployment.template.json'
+              defaultPlatform: 'arm64v8'
+              deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+              validateGeneratedDeploymentManifest: 'true'
+
+          - task: AzureIoTEdge@2
+            inputs:
+              action: 'Deploy to IoT Edge devices'
+              deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+              azureSubscription: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
+              iothubname: 'IoTHubPlantTFM'
+              deploymentid: '$(System.TeamProject)-devops-deployment'
+              priority: '0'
+              deviceOption: 'Single Device'
+              deviceId: 'raspberrypi4'
+
+        
