@@ -58,7 +58,20 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.soil.debug}",
-              "createOptions": {}
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
             }
           },
           "SimulatedTemperatureSensor": {
@@ -78,7 +91,20 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.leaves.debug}",
-              "createOptions": {}
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
             }
           },
           "ambient": {
@@ -88,7 +114,20 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.ambient.debug}",
-              "createOptions": {}
+              "createOptions": {
+                "ExposedPorts": {
+                  "5678/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "5678/tcp": [
+                      {
+                        "HostPort": "5678"
+                      }
+                    ]
+                  }
+                }
+              }
             }
           }
         }

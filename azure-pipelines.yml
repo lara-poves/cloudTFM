@@ -1,70 +1,90 @@
-# Starter pipeline
-
 trigger:
-  - main
+- main
 
 stages:
-  - stage: Build
-    jobs:
-      - job: J1
-        pool:
-          vmImage: ubuntu-22.04
-        steps:
+- stage: Build
+  jobs:
+  - job: J1
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+    
+    - script: |
+        docker run --privileged --rm tonistiigi/binfmt --install all
+        docker buildx create --use --name arm32builder
+        docker buildx inspect --bootstrap
 
-          - script: |
-              docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
-              docker buildx create --use --name buildx_builder || true
-            displayName: 'Setup Docker Buildx'
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+      displayName: 'Setup buildx & Login in CR'
 
-          - script: |
-              cd ./modules/$(MODULE_SOIL)
-              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) --push .
-            displayName: 'Build & Push Docker Image Soil (ARM32)'
+    - script: |
+        cd ./modules/$(MODULE_SOIL)
+        docker buildx build \
+          --builder arm32builder \
+          --platform linux/arm/v7 \
+          --no-cache \
+          -f Dockerfile.arm32v7 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
+          --push .
+      displayName: 'Build and Push ARM32 Docker Image for Soil'
 
-          - script: |
-              cd ./modules/$(MODULE_AMBIENT)
-              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) --push .
-            displayName: 'Build & Push Docker Image Ambient (ARM32)'
+    - script: |
+        cd ./modules/$(MODULE_AMBIENT)
+        docker buildx build \
+          --builder arm32builder \
+          --platform linux/arm/v7 \
+          --no-cache \
+          -f Dockerfile.arm32v7 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
+          --push .
+      displayName: 'Build and Push ARM32 Docker Image for Ambient'
+    
+    - script: |
+        cd ./modules/$(MODULE_LEAVES)
+        docker buildx build \
+          --builder arm32builder \
+          --platform linux/arm/v7 \
+          --no-cache \
+          -f Dockerfile.arm32v7 \
+          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
+          --push .
+      displayName: 'Build and Push ARM32 Docker Image for Leaves'
 
-          - script: |
-              cd ./modules/$(MODULE_LEAVES)
-              docker buildx build --platform linux/arm/v7 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) --push .
-            displayName: 'Build & Push Docker Image Leaves (ARM32)'
+- stage: Release
+  jobs:
+  - job: J2
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+      - script: |
+          sudo apt install software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt install python3.9
 
+          sudo apt install python3.9-distutils
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3.9 get-pip.py
 
-  - stage: Release
-    jobs:
-      - job: J2
-        pool:
-          vmImage: ubuntu-22.04
-        steps:
-          - script: |
-              sudo apt install software-properties-common
-              sudo add-apt-repository ppa:deadsnakes/ppa
-              sudo apt install python3.9
-              sudo apt install python3.9-distutils
-              curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-              python3.9 get-pip.py
-              python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
-            displayName: 'Install Python and iotedgedev'
+          python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
+        displayName: 'Install Python3.9 & iotedgedev'
 
-          - task: AzureIoTEdge@2
-            inputs:
-              action: 'Generate deployment manifest'
-              templateFilePath: 'deployment.template.json'
-              defaultPlatform: 'arm32v7'
-              deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
-              validateGeneratedDeploymentManifest: 'true'
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Generate deployment manifest'
+          templateFilePath: 'deployment.template.json'
+          defaultPlatform: 'arm32v7'
+          deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+          validateGeneratedDeploymentManifest: 'false'
+        displayName: 'Generate deployment manifest'
 
-          - task: AzureIoTEdge@2
-            inputs:
-              action: 'Deploy to IoT Edge devices'
-              deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
-              azureSubscription: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
-              iothubname: 'IoTHubPlantTFM'
-              deploymentid: '$(System.TeamProject)-devops-deployment'
-              priority: '0'
-              deviceOption: 'Single Device'
-              deviceId: 'raspberrypi4'
-
-        
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Deploy to IoT Edge devices'
+          deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+          azureSubscription: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
+          iothubname: 'IoTHubPlantTFM'
+          deploymentid: '$(System.TeamProject)-devops-deployment'
+          priority: '0'
+          deviceOption: 'Single Device'
+          deviceId: 'raspberrypi4'
+        displayName: 'Deploy to IoT Edge devices'

@@ -10,7 +10,7 @@
             "minDockerVersion": "v1.25",
             "loggingOptions": "",
             "registryCredentials": {
-                "containerregistrytfm": {
+              "containerregistrytfm": {
                 "username": "${CONTAINER_REGISTRY_USERNAME}",
                 "password": "${CONTAINER_REGISTRY_PASSWORD}",
                 "address": "${CONTAINER_REGISTRY_ADDRESS}"
@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.5",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
               "createOptions": {}
             }
           },
@@ -31,24 +31,18 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.5",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
                     "5671/tcp": [
-                      {
-                        "HostPort": "5671"
-                      }
+                      { "HostPort": "5671" }
                     ],
                     "8883/tcp": [
-                      {
-                        "HostPort": "8883"
-                      }
+                      { "HostPort": "8883" }
                     ],
                     "443/tcp": [
-                      {
-                        "HostPort": "443"
-                      }
+                      { "HostPort": "443" }
                     ]
                   }
                 }
@@ -57,13 +51,13 @@
           }
         },
         "modules": {
-          "soil": {
+          "ambient": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
+              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
               "createOptions": {}
             }
           },
@@ -77,13 +71,13 @@
               "createOptions": {}
             }
           },
-          "ambient": {
+          "soil": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
+              "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
               "createOptions": {}
             }
           }
@@ -94,9 +88,9 @@
       "properties.desired": {
         "schemaVersion": "1.2",
         "routes": {
-          "soilToIoTHub": "FROM /messages/modules/soil/outputs/* INTO $upstream",
+          "ambientToIoTHub": "FROM /messages/modules/ambient/outputs/* INTO $upstream",
           "leavesToIoTHub": "FROM /messages/modules/leaves/outputs/* INTO $upstream",
-          "ambientToIoTHub": "FROM /messages/modules/ambient/outputs/* INTO $upstream"
+          "soilToIoTHub": "FROM /messages/modules/soil/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
