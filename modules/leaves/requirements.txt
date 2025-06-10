@@ -1,4 +1,4 @@
 azure-iot-device==2.7.1
+numpy
 opencv-python
 scikit-learn
-numpy
