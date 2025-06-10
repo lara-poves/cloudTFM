@@ -16,54 +16,53 @@ internal class ModuleBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        try
+        _cancellationToken = cancellationToken;
+
+        // Configure MQTT transport settings
+        MqttTransportSettings mqttSetting = new(TransportType.Mqtt_Tcp_Only);
+        ITransportSettings[] settings = { mqttSetting };
+
+        // Create the module client using environment variables (Edge runtime)
+        _moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
+        _moduleClient.SetConnectionStatusChangesHandler((status, reason) =>
+            _logger.LogWarning("Connection changed: Status: {status} Reason: {reason}", status, reason));
+
+        // Open the connection to IoT Edge runtime
+        await _moduleClient.OpenAsync(cancellationToken);
+        _logger.LogInformation("IoT Hub module client initialized.");
+
+        double oximetry = 97.0; // Initial SpO2 value in percentage
+
+        // Start the simulation loop
+        while (!cancellationToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Starting ExecuteAsync in soil module...");
+            // Add a small random variation between -0.5% and +0.5%
+            oximetry += _random.Next(-5, 6) / 10.0;
 
-            _cancellationToken = cancellationToken;
+            // Clamp values between 0 and 100
+            oximetry = Math.Clamp(oximetry, 0.0, 100.0);
 
-            MqttTransportSettings mqttSetting = new(TransportType.Mqtt_Tcp_Only);
-            ITransportSettings[] settings = { mqttSetting };
-
-            _moduleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
-            _moduleClient.SetConnectionStatusChangesHandler((status, reason) =>
-                _logger.LogWarning("Connection changed: Status: {status} Reason: {reason}", status, reason));
-
-            await _moduleClient.OpenAsync(cancellationToken);
-            _logger.LogInformation("IoT Hub module client initialized.");
-
-            double oximetry = 97.0;
-
-            while (!cancellationToken.IsCancellationRequested)
+            var oximetryData = new
             {
-                oximetry += _random.Next(-5, 6) / 10.0;
-                oximetry = Math.Clamp(oximetry, 0.0, 100.0);
+                spo2 = Math.Round(oximetry, 1),
+                timestamp = DateTime.UtcNow
+            };
 
-                var oximetryData = new
-                {
-                    spo2 = Math.Round(oximetry, 1),
-                    timestamp = DateTime.UtcNow
-                };
+            // Serialize the data to JSON
+            string messageString = JsonSerializer.Serialize(oximetryData);
+            var messageBytes = Encoding.UTF8.GetBytes(messageString);
+            using var message = new Message(messageBytes)
+            {
+                ContentType = "application/json",
+                ContentEncoding = "utf-8"
+            };
 
-                string messageString = JsonSerializer.Serialize(oximetryData);
-                var messageBytes = Encoding.UTF8.GetBytes(messageString);
-                using var message = new Message(messageBytes)
-                {
-                    ContentType = "application/json",
-                    ContentEncoding = "utf-8"
-                };
+            // Send the message to output1
+            await _moduleClient.SendEventAsync("output1", message, cancellationToken);
+            _logger.LogInformation("Sent simulated SpO2: {OximetryData}", messageString);
 
-                await _moduleClient.SendEventAsync("output1", message, cancellationToken);
-                _logger.LogInformation("Sent simulated SpO2: {OximetryData}", messageString);
-
-                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled exception in ExecuteAsync");
-            Console.WriteLine($"Unhandled exception: {ex.Message}");
+            // Wait 5 seconds before sending the next message
+            await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
         }
     }
-
 }

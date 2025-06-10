@@ -12,18 +12,21 @@ stages:
         steps:
           - script: |
               cd ./modules/$(MODULE_SOIL)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              # Remove --os linux --arch arm64 as these are now defined in .csproj
+              dotnet publish /t:PublishContainer
             displayName: 'Build Docker Image Soil'
 
           - script: |
               docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+              # The image name is now likely generated with the module name from .csproj
+              # You can tag it explicitly like this if the .csproj doesn't define PublishContainerTag
               docker tag $(MODULE_SOIL) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
               docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
             displayName: 'Push Docker Image Soil'
 
           - script: |
               cd ./modules/$(MODULE_AMBIENT)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              dotnet publish /t:PublishContainer
             displayName: 'Build Docker Image Ambient'
 
           - script: |
@@ -34,7 +37,7 @@ stages:
 
           - script: |
               cd ./modules/$(MODULE_LEAVES)
-              dotnet publish --os linux --arch arm64 /t:PublishContainer
+              dotnet publish /t:PublishContainer
             displayName: 'Build Docker Image Leaves'
 
           - script: |
