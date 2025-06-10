@@ -2,6 +2,45 @@ trigger:
 - main
 
 stages:
+- stage: Build
+  jobs:
+  - job: J1
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+    - script: |
+        cd ./modules/$(MODULE_SOIL)
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) 
+      displayName: 'Build Image for Soil'
+    
+    - script: |
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+        docker tag $(MODULE_SOIL) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
+        docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL)
+      displayName: 'Push Docker Image for Soil'
+    
+    - script: |
+        cd ./modules/$(MODULE_AMBIENT)
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) 
+      displayName: 'Build Image for Ambient'
+    
+    - script: |
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+        docker tag $(MODULE_AMBIENT) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
+        docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT)
+      displayName: 'Push Docker Image for Ambient'
+    
+    - script: |
+        cd ./modules/$(MODULE_LEAVES)
+        docker build --platform linux/arm64 -f Dockerfile.arm64v8 -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) 
+      displayName: 'Build Image for Soil'
+    
+    - script: |
+        docker login -u $(CONTAINER_REGISTRY_USERNAME) -p $(CONTAINER_REGISTRY_PASSWORD) $(CONTAINER_REGISTRY_ADDRESS)
+        docker tag $(MODULE_LEAVES) $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
+        docker push $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES)
+      displayName: 'Push Docker Image for Soil'
+
 - stage: Release
   jobs:
   - job: J2
@@ -19,23 +58,6 @@ stages:
 
           python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
         displayName: 'Command Line Script'
-      - task: AzureIoTEdge@2
-        inputs:
-          action: 'Build module images'
-          templateFilePath: 'deployment.template.json'
-          defaultPlatform: 'arm64v8'
-        displayName: 'Build img'
-      
-      - task: AzureIoTEdge@2
-        inputs:
-          action: 'Push module images'
-          containerregistrytype: 'Azure Container Registry'
-          azureSubscriptionEndpoint: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
-          azureContainerRegistry: '{"loginServer":"containerregistrytfm.azurecr.io"}'
-          templateFilePath: 'deployment.template.json'
-          defaultPlatform: 'arm64v8'
-          fillRegistryCredential: 'true'
-        displayName: 'Push img'
       - task: AzureIoTEdge@2
         inputs:
           action: 'Generate deployment manifest'
