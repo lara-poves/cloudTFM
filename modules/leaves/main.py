@@ -44,8 +44,7 @@ def calcular_porcentaje_infeccion(masked_img, domain_color, threshold=75):
 
 async def send_sensor_data(client):
     dir_imgs = "img"
-    imgs = [f for f in os.listdir(dir_imgs)
-            if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    imgs = [f for f in os.listdir(dir_imgs) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     while not stop_event.is_set():
         # Choose a random image

@@ -26,7 +26,7 @@ stages:
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
           --push .
-      displayName: 'Build and Push ARM32 Docker Image for Soil'
+      displayName: 'Build & Push soil img arm32'
 
     - script: |
         cd ./modules/$(MODULE_AMBIENT)
@@ -37,7 +37,7 @@ stages:
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
           --push .
-      displayName: 'Build and Push ARM32 Docker Image for Ambient'
+      displayName: 'Build & Push ambient img arm32'
     
     - script: |
         cd ./modules/$(MODULE_LEAVES)
@@ -48,7 +48,7 @@ stages:
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
           --push .
-      displayName: 'Build and Push ARM32 Docker Image for Leaves'
+      displayName: 'Build and Push leaves img arm32'
 
 - stage: Release
   jobs:
