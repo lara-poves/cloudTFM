@@ -65,10 +65,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_SOIL}:${MODULE_VERSION_SOIL}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "arch": "arm64"
             }
           },
           "leaves": {
@@ -79,10 +75,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_LEAVES}:${MODULE_VERSION_LEAVES}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "arch": "arm64"
             }
           },
           "ambient": {
@@ -93,10 +85,6 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
               "createOptions": {}
-            },
-            "platform": {
-              "os": "linux",
-              "arch": "arm64"
             }
           }
         }
