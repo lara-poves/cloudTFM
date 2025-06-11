@@ -1,79 +1,72 @@
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for
-# full license information.
-
 import asyncio
 import sys
 import signal
 import threading
+import json
+import Adafruit_DHT
 from azure.iot.device.aio import IoTHubModuleClient
+from azure.iot.device import Message
 
-
-# Event indicating client stop
 stop_event = threading.Event()
 
+# Sensor DHT11
+DHT_SENSOR = Adafruit_DHT.DHT11
+DHT_PIN = 4  
 
 def create_client():
-    client = IoTHubModuleClient.create_from_edge_environment()
+    return IoTHubModuleClient.create_from_edge_environment()
 
-    # Define function for handling received messages
-    async def receive_message_handler(message):
-        # NOTE: This function only handles messages sent to "input1".
-        # Messages sent to other inputs, or to the default, will be discarded
-        if message.input_name == "input1":
-            print("the data in the message received on input1 was ")
-            print(message.data)
-            print("custom properties are")
-            print(message.custom_properties)
-            print("forwarding mesage to output1")
-            await client.send_message_to_output(message, "output1")
+async def send_sensor_data(client):
+    while not stop_event.is_set():
+        humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
 
-    try:
-        # Set handler on the client
-        client.on_message_received = receive_message_handler
-    except:
-        # Cleanup if failure occurs
-        client.shutdown()
-        raise
+        if humidity is not None and temperature is not None:
+            data = {
+                "temperature": round(temperature, 2),
+                "humidity": round(humidity, 2)
+            }
 
-    return client
+            message = Message(json.dumps(data))
+            message.content_encoding = "utf-8"
+            message.content_type = "application/json"
 
+            print(f"Sending real sensor data: {data}")
 
-async def run_sample(client):
-    # Customize this coroutine to do whatever tasks the module initiates
-    # e.g. sending messages
-    while True:
-        await asyncio.sleep(1000)
+            try:
+                await client.send_message_to_output(message, "output1")
+            except Exception as e:
+                print(f"Error sending message: {e}")
+        else:
+            print("Error: could not read from DHT11 sensor.")
 
+        await asyncio.sleep(120)  # Each 2 minutes
+
+async def run_module(client):
+    await send_sensor_data(client)
 
 def main():
     if not sys.version >= "3.5.3":
-        raise Exception( "The sample requires python 3.5.3+. Current version of Python: %s" % sys.version )
-    print ( "IoT Hub Client for Python" )
+        raise Exception(f"This module requires Python 3.5.3+. Current version: {sys.version}")
+    print("DHT11 Sensor Module: Temperature and Humidity")
 
-    # NOTE: Client is implicitly connected due to the handler being set on it
     client = create_client()
 
-    # Define a handler to cleanup when module is is terminated by Edge
-    def module_termination_handler(signal, frame):
-        print ("IoTHubClient sample stopped by Edge")
+    def termination_handler(signal, frame):
+        print("Module terminated by Edge runtime.")
         stop_event.set()
 
-    # Set the Edge termination handler
-    signal.signal(signal.SIGTERM, module_termination_handler)
+    signal.signal(signal.SIGTERM, termination_handler)
 
-    # Run the sample
     loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(run_sample(client))
+        loop.run_until_complete(run_module(client))
     except Exception as e:
-        print("Unexpected error %s " % e)
+        print(f"Unexpected error: {e}")
         raise
     finally:
-        print("Shutting down IoT Hub Client...")
+        print("Shutting down IoT Hub client...")
         loop.run_until_complete(client.shutdown())
         loop.close()
-
 
 if __name__ == "__main__":
     main()

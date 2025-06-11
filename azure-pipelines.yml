@@ -37,16 +37,6 @@ stages:
           --push .
       displayName: 'Build & Push ambient img arm32'
 
-    - script: |
-        cd ./modules/$(MODULE_LEAVES)
-        docker buildx build \
-          --builder arm32builder \
-          --platform linux/arm/v7 \
-          -f Dockerfile.arm32v7 \
-          -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
-          --push .
-      displayName: 'Build and Push leaves img arm32'
-
 - stage: Release
   jobs:
   - job: J2

@@ -12,7 +12,7 @@ stop_event = threading.Event()
 def create_client():
     return IoTHubModuleClient.create_from_edge_environment()
 
-# Controlled incremental change
+# Controll incremental change
 def update_value(value, min_val, max_val, delta=0.1):
     change = random.uniform(-delta, delta)
     new_value = round(value + change, 2)
