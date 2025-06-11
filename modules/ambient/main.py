@@ -8,6 +8,9 @@ import dht11
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+SLEEP_TIME = 60 * 3 # Each 3 minutes
+SLEEP_TIME_ERROR = 5
+
 stop_event = threading.Event()
 
 GPIO.setwarnings(False)
@@ -22,6 +25,7 @@ def create_client():
 
 async def send_sensor_data(client):
     while not stop_event.is_set():
+        sleep_time = SLEEP_TIME
         result = sensor.read()
 
         if result.is_valid():
@@ -35,14 +39,17 @@ async def send_sensor_data(client):
             message.content_type = "application/json"
 
             print(f"Sending sensor data: {data}")
+
             try:
                 await client.send_message_to_output(message, "output1")
             except Exception as e:
                 print(f"Error sending message: {e}")
-
-            await asyncio.sleep(120)  # Each 2 minutes
+                sleep_time = SLEEP_TIME_ERROR
         else:
             print("Error: could not read from DHT11 sensor")
+            sleep_time = SLEEP_TIME_ERROR
+
+        await asyncio.sleep(sleep_time) 
 
 async def run_module(client):
     await send_sensor_data(client)

@@ -11,6 +11,9 @@ import numpy as np
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+SLEEP_TIME = 5 * 60 # Each 5 minutes
+SLEEP_TIME_ERROR = 5
+
 stop_event = threading.Event()
 
 def create_client():
@@ -44,10 +47,12 @@ def calcular_porcentaje_infeccion(masked_img, domain_color, threshold=75):
     return infected.sum() / leaf.sum() * 100
 
 async def send_sensor_data(client):
+    # Read images
     dir_imgs = "img"
     imgs = [f for f in os.listdir(dir_imgs) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     while not stop_event.is_set():
+        sleep_time = SLEEP_TIME
         
         # Choose a random image
         img_name = random.choice(imgs)
@@ -80,8 +85,9 @@ async def send_sensor_data(client):
             await client.send_message_to_output(message, "output1")
         except Exception as e:
             print(f"Error sending message: {e}")
+            sleep_time = SLEEP_TIME_ERROR
 
-        await asyncio.sleep(60 * 5)  # Each 5 minutes
+        await asyncio.sleep(sleep_time)  # Each 5 minutes
 
 async def run_module(client):
     await send_sensor_data(client)

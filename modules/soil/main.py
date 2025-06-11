@@ -7,6 +7,9 @@ import json
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+SLEEP_TIME = 120 # Each 2 minutes
+SLEEP_TIME_ERROR = 5
+
 stop_event = threading.Event()
 
 def create_client():
@@ -28,6 +31,8 @@ async def send_sensor_data(client):
     potassium = 300.0 # mg / kg
 
     while not stop_event.is_set():
+        sleep_time = SLEEP_TIME
+
         # Update values
         ph = update_value(ph, 4.0, 9.0)
         soil_moisture = update_value(soil_moisture, 0.0, 100.0)
@@ -55,8 +60,9 @@ async def send_sensor_data(client):
             await client.send_message_to_output(message, "output1")
         except Exception as e:
             print(f"Error sending message: {e}")
+            sleep_time = SLEEP_TIME_ERROR
 
-        await asyncio.sleep(60) # Each minute
+        await asyncio.sleep(sleep_time) 
 
 async def run_module(client):
     await send_sensor_data(client)
