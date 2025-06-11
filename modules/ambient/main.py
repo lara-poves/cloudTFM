@@ -39,10 +39,10 @@ async def send_sensor_data(client):
                 await client.send_message_to_output(message, "output1")
             except Exception as e:
                 print(f"Error sending message: {e}")
-        else:
-            print("Error: could not read from DHT11 sensor.")
 
-        await asyncio.sleep(90)  # Cada 1.5 minutos
+            await asyncio.sleep(120)  # Each 2 minutes
+        else:
+            print("Error: could not read from DHT11 sensor")
 
 async def run_module(client):
     await send_sensor_data(client)
