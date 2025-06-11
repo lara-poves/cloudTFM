@@ -5,9 +5,9 @@ import threading
 import random
 import json
 import os  
-import cv2  
+#import cv2  
 import numpy as np  
-from sklearn.cluster import KMeans  
+#from sklearn.cluster import KMeans  
 
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
@@ -17,6 +17,7 @@ stop_event = threading.Event()
 def create_client():
     return IoTHubModuleClient.create_from_edge_environment()
 
+'''
 def segment_leaf(img_rgb):
     hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
 
@@ -41,12 +42,13 @@ def calcular_porcentaje_infeccion(masked_img, domain_color, threshold=75):
     infected = (diff > threshold) & leaf
 
     return infected.sum() / leaf.sum() * 100
-
+'''
 async def send_sensor_data(client):
     dir_imgs = "img"
     imgs = [f for f in os.listdir(dir_imgs) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     while not stop_event.is_set():
+        '''
         # Choose a random image
         img_name = random.choice(imgs)
         img_path = os.path.join(dir_imgs, img_name)
@@ -67,12 +69,18 @@ async def send_sensor_data(client):
             "domain_color": domain_color.tolist(),
             "infected_percentage": inf_pct
         }
+        '''
+
+        data = {
+            "domain_color": 1,
+            "infected_percentage": 1
+        }
 
         message = Message(json.dumps(data))
         message.content_encoding = "utf-8"
         message.content_type = "application/json"
 
-        print(f"Sending simulated sensor data from {img_name}: {data}")
+        #print(f"Sending simulated sensor data from {img_name}: {data}")
 
         try:
             await client.send_message_to_output(message, "output1")
