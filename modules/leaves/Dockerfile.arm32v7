@@ -1,32 +1,15 @@
-FROM arm32v7/python:3.7-slim-buster
+# Imagen ARMv7 con OpenCV y Python preinstalado
+FROM jritsema/opencv-tensorflow-lite-arm32v7
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    pkg-config \
-    libjpeg-dev \
-    libtiff-dev \
-    libpng-dev \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    libv4l-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    libgtk-3-dev \
-    libatlas-base-dev \
-    gfortran \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar requerimientos (sin opencv)
+COPY requirements.txt .
 
-COPY requirements.txt ./
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -r requirements.txt
 
-RUN pip install --upgrade pip setuptools wheel
-
-RUN pip install -r requirements.txt
-
+# Copiar tu código
 COPY . .
 
-CMD ["python3", "-u", "./main.py"]
+CMD ["python", "main.py"]
