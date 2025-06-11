@@ -1,15 +1,14 @@
-# Imagen ARMv7 con OpenCV y Python preinstalado
+# ARMv7 image with python and openCV pre-installed 
 FROM jritsema/opencv-tensorflow-lite-arm32v7
 
 WORKDIR /app
 
-# Copiar requerimientos (sin opencv)
 COPY requirements.txt .
-
 RUN pip install --upgrade pip setuptools wheel \
     && pip install -r requirements.txt
 
-# Copiar tu código
+
 COPY . .
 
 CMD ["python", "main.py"]
+

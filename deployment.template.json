@@ -73,7 +73,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_LEAVES}:${MODULE_VERSION_LEAVES}",
-              "createOptions": {}
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/home/lara/img:/app/img\"]}}"
             }
           },
           "soil": {
