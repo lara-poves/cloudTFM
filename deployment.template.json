@@ -53,15 +53,13 @@
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
               "createOptions": {
-                "HostConfig": {
-                  "Binds": [
-                    "/sys/class/gpio:/sys/class/gpio"
-                  ],
+                  "HostConfig": {
+                  "Privileged": true,
                   "Devices": [
                     {
                       "PathOnHost": "/dev/gpiomem",
                       "PathInContainer": "/dev/gpiomem",
-                      "CgroupPermissions": "rwm"
+                      "CgroupPermissions": "mrw"
                     }
                   ]
                 }
