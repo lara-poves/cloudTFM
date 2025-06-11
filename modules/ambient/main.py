@@ -3,35 +3,38 @@ import sys
 import signal
 import threading
 import json
-import Adafruit_DHT
+import RPi.GPIO as GPIO
+import dht11
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
 stop_event = threading.Event()
 
-# Sensor DHT11
-DHT_SENSOR = Adafruit_DHT.DHT11
-DHT_PIN = 4  
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.cleanup()
+
+# DHT11 sensor in GPIO4
+sensor = dht11.DHT11(pin=4)
 
 def create_client():
     return IoTHubModuleClient.create_from_edge_environment()
 
 async def send_sensor_data(client):
     while not stop_event.is_set():
-        humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+        result = sensor.read()
 
-        if humidity is not None and temperature is not None:
+        if result.is_valid():
             data = {
-                "temperature": round(temperature, 2),
-                "humidity": round(humidity, 2)
+                "temperature": result.temperature,
+                "humidity": result.humidity
             }
 
             message = Message(json.dumps(data))
             message.content_encoding = "utf-8"
             message.content_type = "application/json"
 
-            print(f"Sending real sensor data: {data}")
-
+            print(f"Sending sensor data: {data}")
             try:
                 await client.send_message_to_output(message, "output1")
             except Exception as e:
@@ -39,7 +42,7 @@ async def send_sensor_data(client):
         else:
             print("Error: could not read from DHT11 sensor.")
 
-        await asyncio.sleep(120)  # Each 2 minutes
+        await asyncio.sleep(90)  # Cada 1.5 minutos
 
 async def run_module(client):
     await send_sensor_data(client)
@@ -47,7 +50,7 @@ async def run_module(client):
 def main():
     if not sys.version >= "3.5.3":
         raise Exception(f"This module requires Python 3.5.3+. Current version: {sys.version}")
-    print("DHT11 Sensor Module: Temperature and Humidity")
+    print("DHT11 Sensor Module inside Docker")
 
     client = create_client()
 

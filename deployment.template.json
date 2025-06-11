@@ -35,15 +35,9 @@
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
-                    "5671/tcp": [
-                      { "HostPort": "5671" }
-                    ],
-                    "8883/tcp": [
-                      { "HostPort": "8883" }
-                    ],
-                    "443/tcp": [
-                      { "HostPort": "443" }
-                    ]
+                    "5671/tcp": [{ "HostPort": "5671" }],
+                    "8883/tcp": [{ "HostPort": "8883" }],
+                    "443/tcp": [{ "HostPort": "443" }]
                   }
                 }
               }
@@ -58,7 +52,20 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${CONTAINER_REGISTRY_ADDRESS}/${MODULE_AMBIENT}:${MODULE_VERSION_AMBIENT}",
-              "createOptions": {}
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/sys/class/gpio:/sys/class/gpio"
+                  ],
+                  "Devices": [
+                    {
+                      "PathOnHost": "/dev/gpiomem",
+                      "PathInContainer": "/dev/gpiomem",
+                      "CgroupPermissions": "rwm"
+                    }
+                  ]
+                }
+              }
             }
           },
           "leaves": {
