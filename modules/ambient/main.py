@@ -39,13 +39,13 @@ async def send_sensor_data(client):
             message.content_type = "application/json"
 
             try:
-                print(f"Sending sensor data: {data}")
+                print(f"Sending DHT11 sensor data: {data}", flush=True)
                 await client.send_message_to_output(message, "output1")
             except Exception as e:
-                print(f"Error sending message: {e}")
+                print(f"Error sending message: {e}", flush=True)
                 sleep_time = SLEEP_TIME_ERROR
         else:
-            print("Error: could not read from DHT11 sensor")
+            print("Error: could not read from DHT11 sensor", flush=True)
             sleep_time = SLEEP_TIME_ERROR
 
         await asyncio.sleep(sleep_time) 
