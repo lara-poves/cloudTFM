@@ -54,9 +54,8 @@ async def send_sensor_data(client):
         message.content_encoding = "utf-8"
         message.content_type = "application/json"
 
-        print(f"Sending simulated sensor data: {data}")
-
         try:
+            print(f"Sending simulated sensor data: {data}")
             await client.send_message_to_output(message, "output1")
         except Exception as e:
             print(f"Error sending message: {e}")

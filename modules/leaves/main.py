@@ -79,12 +79,11 @@ async def send_sensor_data(client):
         message.content_encoding = "utf-8"
         message.content_type = "application/json"
 
-        print(f"Sending simulated sensor data from {img_name}: {data}")
-
         try:
+            print(f"Sending simulated sensor data from {img_name}: {data}", flush=True)
             await client.send_message_to_output(message, "output1")
         except Exception as e:
-            print(f"Error sending message: {e}")
+            print(f"Error sending message: {e}", flush=True)
             sleep_time = SLEEP_TIME_ERROR
 
         await asyncio.sleep(sleep_time)  # Each 5 minutes
