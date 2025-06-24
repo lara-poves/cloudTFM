@@ -7,6 +7,9 @@ import json
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+PLANT_ID = 1
+DEVICE_TYPE = "soil"
+
 SLEEP_TIME = 120 # Each 2 minutes
 SLEEP_TIME_ERROR = 5
 
@@ -47,7 +50,9 @@ async def send_sensor_data(client):
             "soil_temperature": soil_temperature,
             "nitrogen": nitrogen,
             "phosphorus": phosphorus,
-            "potassium": potassium
+            "potassium": potassium,
+            "plantId": PLANT_ID,
+            "deviceType": DEVICE_TYPE
         }
 
         message = Message(json.dumps(data))

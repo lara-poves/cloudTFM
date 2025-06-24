@@ -8,6 +8,9 @@ import dht11
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+PLANT_ID = 1
+DEVICE_TYPE = "ambient"
+
 SLEEP_TIME = 60 * 3 # Each 3 minutes
 SLEEP_TIME_ERROR = 5
 
@@ -31,7 +34,9 @@ async def send_sensor_data(client):
         if result.is_valid():
             data = {
                 "temperature": result.temperature,
-                "humidity": result.humidity
+                "humidity": result.humidity,
+                "plantId": PLANT_ID,
+                "deviceType": DEVICE_TYPE
             }
 
             message = Message(json.dumps(data))

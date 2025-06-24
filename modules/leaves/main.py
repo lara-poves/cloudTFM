@@ -11,6 +11,9 @@ import numpy as np
 from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
+PLANT_ID = 1
+DEVICE_TYPE = "leave"
+
 SLEEP_TIME = 5 * 60 # Each 5 minutes
 SLEEP_TIME_ERROR = 5
 
@@ -72,7 +75,9 @@ async def send_sensor_data(client):
         # Create message
         data = {
             "domain_color": domain_color.tolist(),
-            "infected_percentage": inf_pct
+            "infected_percentage": inf_pct,
+            "plantId": PLANT_ID,
+            "deviceType": DEVICE_TYPE
         }
 
         message = Message(json.dumps(data))
