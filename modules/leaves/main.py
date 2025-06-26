@@ -61,7 +61,6 @@ async def send_sensor_data(client):
         img_name = random.choice(imgs)
         img_path = os.path.join(dir_imgs, img_name)
         leaf_rgb = cv2.imread(img_path)
-        leaf_rgb = cv2.cvtColor(leaf_rgb, cv2.COLOR_BGR2RGB)
 
         # Segmented and edored the image
         mask = segment_leaf(leaf_rgb)
