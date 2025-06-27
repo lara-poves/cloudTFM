@@ -12,7 +12,7 @@ from azure.iot.device.aio import IoTHubModuleClient
 from azure.iot.device import Message
 
 PLANT_ID = 1
-DEVICE_TYPE = "leave"
+DEVICE_TYPE = "leaves"
 
 SLEEP_TIME = 5 * 60 # Each 5 minutes
 SLEEP_TIME_ERROR = 5
