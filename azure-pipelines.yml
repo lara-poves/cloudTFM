@@ -24,8 +24,7 @@ stages:
           --platform linux/arm/v7 \
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):$(MODULE_VERSION_SOIL) \
-          --cache-from=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):cache \
-          --cache-to=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_SOIL):cache,mode=max \
+       
           --push .
       displayName: 'Build & Push soil img arm32'
 
@@ -36,8 +35,7 @@ stages:
           --platform linux/arm/v7 \
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):$(MODULE_VERSION_AMBIENT) \
-          --cache-from=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):cache \
-          --cache-to=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_AMBIENT):cache,mode=max \
+          
           --push .
       displayName: 'Build & Push ambient img arm32'
 
@@ -48,8 +46,7 @@ stages:
           --platform linux/arm/v7 \
           -f Dockerfile.arm32v7 \
           -t $(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):$(MODULE_VERSION_LEAVES) \
-          --cache-from=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):cache \
-          --cache-to=type=registry,ref=$(CONTAINER_REGISTRY_ADDRESS)/$(MODULE_LEAVES):cache,mode=max \
+          
           --push .
       displayName: 'Build & Push leaves img arm32'
 
