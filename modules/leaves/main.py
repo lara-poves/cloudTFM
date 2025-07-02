@@ -73,7 +73,9 @@ async def send_sensor_data(client):
 
         # Create message
         data = {
-            "domain_color": domain_color.tolist(),
+            "r": int(domain_color[0]),
+            "g": int(domain_color[1]),
+            "b": int(domain_color[2]),
             "infected_percentage": round(inf_pct, 2),
             "plantId": PLANT_ID,
             "deviceType": DEVICE_TYPE
