@@ -37,8 +37,8 @@ def get_domain_color(pixels):
     mean_color = np.mean(pixels, axis=0)
     return np.round(mean_color).astype(int)
 
-def get_infection_percentage(pixels, healthy_color, threshold=75):
-    color_diff = np.linalg.norm(pixels - healthy_color, axis=1)
+def get_infection_percentage(pixels, domain_color, threshold=75):
+    color_diff = np.linalg.norm(pixels - domain_color, axis=1)
     infected = color_diff > threshold
     return infected.sum() / len(pixels) * 100
 
