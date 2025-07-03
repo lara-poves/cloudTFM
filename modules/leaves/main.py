@@ -22,61 +22,53 @@ stop_event = threading.Event()
 def create_client():
     return IoTHubModuleClient.create_from_edge_environment()
 
-def segment_leaf(img_rgb):
-    hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+def segment_leaf(image_rgb):
+    hsv = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2HSV)
+    lower_bound = np.array([20, 30, 30])     
+    upper_bound = np.array([90, 255, 255])    
+    return cv2.inRange(hsv, lower_bound, upper_bound)
 
-    lower_leaf = np.array([20, 30, 30])     
-    upper_leaf = np.array([90, 255, 255])    
+def extract_leaf_pixels(image_rgb, mask):
+    return image_rgb[mask > 0]
 
-    mask = cv2.inRange(hsv, lower_leaf, upper_leaf)
-    return mask
-
-def get_domain_color(masked_img):
-    pixels = masked_img.reshape(-1, 3)
-    pixels = pixels[np.any(pixels > 0, axis=1)]
-
+def get_domain_color(pixels):
     if pixels.size == 0:
-        return np.array([0, 0, 0]) # All img black
+        return np.array([0, 0, 0])  # Fully black image
+    mean_color = np.mean(pixels, axis=0)
+    return np.round(mean_color).astype(int)
 
-    avg_color = np.mean(pixels, axis=0)
-    return np.round(avg_color).astype(int)
-
-def calcular_porcentaje_infeccion(masked_img, domain_color, threshold=75):
-    pixels = masked_img.reshape(-1, 3)
-    leaf  = np.any(pixels > 0, axis=1) 
-    diff   = np.linalg.norm(pixels - domain_color, axis=1)
-    infected = (diff > threshold) & leaf
-
-    return infected.sum() / leaf.sum() * 100
+def get_infection_percentage(pixels, healthy_color, threshold=75):
+    color_diff = np.linalg.norm(pixels - healthy_color, axis=1)
+    infected = color_diff > threshold
+    return infected.sum() / len(pixels) * 100
 
 async def send_sensor_data(client):
-    # Read images
-    dir_imgs = "img"
-    imgs = [f for f in os.listdir(dir_imgs) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    image_dir = "img"
+    image_files = [f for f in os.listdir(image_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     while not stop_event.is_set():
-        sleep_time = SLEEP_TIME
-        
-        # Choose a random image
-        img_name = random.choice(imgs)
-        img_path = os.path.join(dir_imgs, img_name)
-        leaf_rgb = cv2.imread(img_path)
+        await asyncio.sleep(SLEEP_TIME)
 
-        # Segmented and edored the image
-        mask = segment_leaf(leaf_rgb)
+        # Select a random image
+        image_name = random.choice(image_files)
+        image_path = os.path.join(image_dir, image_name)
+        image_rgb = cv2.imread(image_path)
+
+        # Segment and erode
+        mask = segment_leaf(image_rgb)
         mask = cv2.erode(mask, np.ones((3, 3), np.uint8), iterations=7)
-        leaf_only = cv2.bitwise_and(leaf_rgb, leaf_rgb, mask=mask)
+        leaf_pixels = extract_leaf_pixels(image_rgb, mask)
 
-        # Get parameters
-        domain_color = get_domain_color(leaf_only)
-        inf_pct = calcular_porcentaje_infeccion(leaf_only, domain_color)
+        # Analyze infection
+        domain_color = get_domain_color(leaf_pixels)
+        infection_percentage = get_infection_percentage(leaf_pixels, domain_color)
 
         # Create message
         data = {
             "domain_r": int(domain_color[0]),
             "domain_g": int(domain_color[1]),
             "domain_b": int(domain_color[2]),
-            "infected_percentage": round(inf_pct, 2),
+            "infected_percentage": round(infection_percentage, 2),
             "plantId": PLANT_ID,
             "deviceType": DEVICE_TYPE
         }
