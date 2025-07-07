@@ -70,7 +70,9 @@ async def send_sensor_data(client):
             "domain_b": int(domain_color[2]),
             "infected_percentage": round(infection_percentage, 2),
             "plantId": PLANT_ID,
-            "deviceType": DEVICE_TYPE
+            "deviceType": DEVICE_TYPE,
+            "latitude": 40.4168,
+            "longitude": -3.7038
         }
 
         message = Message(json.dumps(data))
