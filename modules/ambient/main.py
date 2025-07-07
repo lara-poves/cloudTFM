@@ -36,7 +36,9 @@ async def send_sensor_data(client):
                 "temperature": result.temperature,
                 "humidity": result.humidity,
                 "plantId": PLANT_ID,
-                "deviceType": DEVICE_TYPE
+                "deviceType": DEVICE_TYPE,
+                "latitude": 40.4168,
+                "longitude": -3.7038
             }
 
             message = Message(json.dumps(data))
