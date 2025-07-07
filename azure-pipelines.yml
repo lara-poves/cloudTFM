@@ -84,10 +84,9 @@ stages:
         inputs:
           action: 'Deploy to IoT Edge devices'
           deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
-          azureSubscription: 'Azure for Students(4)(cdbe522d-a95d-4d8c-b999-af7984931bc9)'
-          iothubname: 'IoTHubPlantTFM'
+          azureSubscription: 'Suscripción de Visual Studio Professional(483ff8af-6ad3-4f74-b959-c6a7590d7026)'
+          iothubname: 'IoTHubCropsTFM'
           deploymentid: '$(System.TeamProject)-devops-deployment'
           priority: '0'
           deviceOption: 'Single Device'
-          deviceId: 'raspberrypi4'
-        displayName: 'Deploy to IoT Edge devices'
+          deviceId: 'raspberrypi4modelb'
