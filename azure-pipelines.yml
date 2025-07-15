@@ -53,3 +53,40 @@ stages:
           --push .
       displayName: 'Build & Push leaves img arm32'
 
+- stage: Release
+  jobs:
+  - job: J2
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+      - script: |
+          sudo apt install software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt install python3.9
+
+          sudo apt install python3.9-distutils
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3.9 get-pip.py
+
+          python3.9 -m pip install -U iotedgedev pyOpenSSL==22.0.0 urllib3==1.22 requests
+        displayName: 'Install Python3.9 & iotedgedev'
+
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Generate deployment manifest'
+          templateFilePath: 'deployment.template.json'
+          defaultPlatform: 'arm32v7'
+          deploymentManifestOutputPath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+          validateGeneratedDeploymentManifest: 'false'
+        displayName: 'Generate deployment manifest'
+
+      - task: AzureIoTEdge@2
+        inputs:
+          action: 'Deploy to IoT Edge devices'
+          deploymentFilePath: '$(System.DefaultWorkingDirectory)/config/deployment.json'
+          azureSubscription: 'studnetfedi'
+          iothubname: 'IoTHubPlantTFMprueba'
+          deploymentid: '$(System.TeamProject)-devops-deployment'
+          priority: '0'
+          deviceOption: 'Single Device'
+          deviceId: 'raspberrypi4prueba'
