@@ -2,11 +2,15 @@ FROM arm32v7/python:3.7-slim-buster
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-dev \
-    python3-rpi.gpio \
-    && rm -rf /var/lib/apt/lists/*
+# Redirigir repos a archive.debian.org para buster EOL
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org|http://archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        python3-dev \
+        python3-rpi.gpio && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel
@@ -15,4 +19,3 @@ RUN pip install -r requirements.txt
 COPY . .
 
 CMD ["python3", "-u", "./main.py"]
-
